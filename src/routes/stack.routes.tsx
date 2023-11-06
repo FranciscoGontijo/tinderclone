@@ -8,13 +8,23 @@ import LoginScreen from "../screens/LoginScreen";
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
+    const user: Boolean = true;
 
     return (
-            <Stack.Navigator>
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="Chat" component={ChatScreen} />
-                <Stack.Screen name="Login" component={LoginScreen} />
-            </Stack.Navigator>
+        <Stack.Navigator>
+            {user ? (
+                <>
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                    <Stack.Screen name="Chat" component={ChatScreen} />
+                </>
+            ) : (
+                <>
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                </>
+            )}
+
+
+        </Stack.Navigator>
     )
 };
 
