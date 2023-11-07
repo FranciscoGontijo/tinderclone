@@ -12,6 +12,7 @@ const StackNavigator = () => {
 
     return (
         <Stack.Navigator>
+
             {user ? (
                 <>
                     <Stack.Screen name="Home" component={HomeScreen} />
@@ -22,8 +23,7 @@ const StackNavigator = () => {
                     <Stack.Screen name="Login" component={LoginScreen} />
                 </>
             )}
-
-
+            
         </Stack.Navigator>
     )
 };
