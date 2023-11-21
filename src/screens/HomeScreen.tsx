@@ -3,7 +3,10 @@ import { SafeAreaView, Text, Button, View, TouchableOpacity, Image, StyleSheet }
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, AntDesign, Entypo } from '@expo/vector-icons';
 
+import { dummyData } from '../data/data';
+
 import useAuth from '../../hooks/useAuth';
+import Swiper from 'react-native-deck-swiper';
 
 const HomeScreen = () => {
     const navigation = useNavigation();
@@ -37,10 +40,25 @@ const HomeScreen = () => {
 
             </View>
 
-            <Text>I am Home Screen</Text>
+            <View style={styles.cardsContainer}>
+                <Swiper
+                    containerStyle={{ backgroundColor: 'transparent' }}
+                    cards={dummyData}
+                    verticalSwipe={false}
+                    renderCard={(card) => {
+                        return (
+                            <View key={card.id} style={styles.card}>
+                                <Image 
+                                    source={{uri: card.photoURL}}
+                                    resizeMode="cover"
+                                    style={styles.cardImage} />
+                                <Text>{card.firstName}</Text>
+                            </View>
+                        )
+                    }}
+                />
+            </View>
 
-            <Button title="Logout" onPress={logout} />
-            
         </SafeAreaView>
     )
 };
@@ -63,5 +81,19 @@ const styles = StyleSheet.create({
     logoImage: {
         height: 45,
         width: 40,
+    },
+    cardsContainer: {
+        flex: 1,
+    },
+    card: {
+        backgroundColor: "lightgray",
+        height: '75%',
+        borderRadius: 10,
+        overflow: 'hidden',
+
+    },
+    cardImage: {
+        height: '80%',
+        width: '100%',
     }
 });
