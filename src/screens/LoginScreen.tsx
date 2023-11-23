@@ -8,10 +8,6 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
 
-  const login = () => {
-    setUser('Francisco');
-  };
-
   return (
     <View style={{ flex: 1, }}>
       <ImageBackground
@@ -20,7 +16,7 @@ const LoginScreen = () => {
         style={{ flex: 1, }}>
         <TouchableOpacity 
           style={styles.signInButton}
-          onPress={login}>
+          onPress={() => navigation.navigate('SignIn')}>
           <Text style={styles.buttonText}>Sign in & get swiping</Text>
         </TouchableOpacity>
       </ImageBackground>
