@@ -1,5 +1,7 @@
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import * as auth from '../src/services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //change AuthContextType with new user type that has all the information about the user and a token
 
@@ -9,6 +11,7 @@ interface AuthContextType {
     user: object | null;
     setUser: React.Dispatch<React.SetStateAction<object | null>>;
     signIn(): Promise<void>;
+    signOut(): void;
 };
 
 const initialContextValue: AuthContextType = {
@@ -17,6 +20,7 @@ const initialContextValue: AuthContextType = {
     user: null,
     setUser: () => { },
     signIn: async () => { },
+    signOut: () => { },
 };
 
 const AuthContext = createContext<AuthContextType>(initialContextValue);
@@ -27,12 +31,47 @@ type AuthProviderProps = {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<object | null>(null);
+    const [loading, setLoading] = useState(true);
+    
 
     const signIn = async (): Promise<void> => {
         const response = await auth.signIn();
         setUser(response.user);
         console.log(response);
+        await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response.user));
+        await AsyncStorage.setItem('@CloneTinder:token', response.token);
     };
+    
+
+    const signOut = async (): Promise<void> => {
+        await AsyncStorage.clear();
+        setUser(null);
+    };
+
+
+    useEffect(() => {
+        async function loadStorageData() {
+            const storagedUser = await AsyncStorage.getItem('@RNAuth:user');
+            const storagedToken = await AsyncStorage.getItem('@RNAuth:token');
+
+            if (storagedUser && storagedToken) {
+                setUser(JSON.parse(storagedUser));
+            }
+            setLoading(false);
+        };
+
+        loadStorageData();
+    }, []);
+
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#666" />
+            </View>
+        );
+    };
+
 
     return (
         <AuthContext.Provider value={{
@@ -40,7 +79,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser,
             token: '',
             signed: Boolean(user),
-            signIn
+            signIn,
+            signOut,
         }}>
             {children}
         </AuthContext.Provider>
