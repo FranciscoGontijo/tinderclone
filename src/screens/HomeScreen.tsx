@@ -10,17 +10,18 @@ import Swiper from 'react-native-deck-swiper';
 
 const HomeScreen = () => {
     const navigation = useNavigation();
-    const { setUser } = useAuth();
+    const { signOut } = useAuth();
 
-    const logout = () => {
-        setUser(null);
+    const likeUser = (cardIndex: number) => {
+        let { id } = dummyData[cardIndex]
+        console.log("Liked " + id)
     }
 
     return (
         <SafeAreaView>
             <View style={styles.header}>
 
-                <TouchableOpacity onPress={logout} >
+                <TouchableOpacity onPress={signOut} >
                     <Image
                         style={styles.profileImage}
                         source={require('../../assets/profile.jpg')} />
@@ -45,6 +46,7 @@ const HomeScreen = () => {
                     containerStyle={{ backgroundColor: 'transparent' }}
                     cards={dummyData}
                     verticalSwipe={false}
+                    onSwipedRight={(card) => likeUser(card)}
                     renderCard={(card) => {
                         return (
                             <View key={card.id} style={styles.card}>
