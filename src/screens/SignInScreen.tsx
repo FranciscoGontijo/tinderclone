@@ -6,13 +6,13 @@ import * as auth from '../services/auth';
 
 
 const SignInScreen: React.FC = () => {
-    const { user, setUser, signed, token, signIn } = useAuth();
+    const { user, signed, signIn } = useAuth();
 
     console.log(signed);
+    console.log(user);
 
     const handleSignIn = () => {
         signIn();
-
     };
 
     return (

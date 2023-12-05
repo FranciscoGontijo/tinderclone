@@ -6,11 +6,16 @@ import api from '../src/services/api';
 
 //change AuthContextType with new user type that has all the information about the user and a token
 
+interface User {
+    name: string;
+    email: string;
+}
+
 interface AuthContextType {
     signed: boolean;
     token: string | null;
-    user: object | null;
-    setUser: React.Dispatch<React.SetStateAction<object | null>>;
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
     signIn(): Promise<void>;
     signOut(): void;
     loading: boolean;
@@ -33,7 +38,7 @@ type AuthProviderProps = {
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [user, setUser] = useState<object | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
 
@@ -42,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(response.user);
 
         api.defaults.headers.Authorization = `Baerer ${response.token}`;
-        
+
         console.log(response);
         await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response.user));
         await AsyncStorage.setItem('@CloneTinder:token', response.token);
