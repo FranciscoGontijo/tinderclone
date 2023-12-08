@@ -13,35 +13,40 @@ const SignInScreen: React.FC = () => {
 
     const [formType, setFormType] = useState<String>('login');
 
-    const { user, signed, signIn } = useAuth();
-    
+    const { user, signed, logIn } = useAuth();
+
     const handleFormChange = () => {
-      
-    }
+        //change form when press button. if login go to signin if signin go to login
+        if (formType === 'login') {
+            setFormType('signin')
+        } else {
+            setFormType('login');
+        }
+        console.log(formType);
+    };
 
     // console.log(signed);
     // console.log(user);
     const handleLogIn = (email: String, password: String): void => {
         // try to log in
+        logIn(email, password);
         console.log(email);
         console.log(password);
-
     }
 
     const handleSignIn = (name: String, email: String, password: String): void => {
 
         // try to sign in
-        signIn();
     };
 
     return (
         <View style={styles.container} >
-            <LogInForm
-            handleFormChange={handleFormChange}
-            handleSubmit={handleLogIn} />
-            <SignInForm
-            handleFormChange={handleFormChange}
-            handleSubmit={handleSignIn} />
+            {formType === 'login' && <LogInForm
+                handleFormChange={handleFormChange}
+                handleSubmit={handleLogIn} />}
+            {formType === 'signin' && <SignInForm
+                handleFormChange={handleFormChange}
+                handleSubmit={handleSignIn} />}
         </View>
     )
 };
