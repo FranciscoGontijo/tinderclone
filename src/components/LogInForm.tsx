@@ -10,23 +10,49 @@ interface LogInProps {
 const LogInForm: React.FC<LogInProps> = (props): JSX.Element => {
     const [userEmail, setUserEmail] = useState<String>('');
     const [password, setPassword] = useState<String>('');
+    const [emailAlert, setEmailAlert] = useState<Boolean>(false);
+    const [passwordAlert, setPasswordAlert] = useState<Boolean>(false);
 
     const { handleFormChange, handleSubmit } = props;
 
     return (
         <View style={styles.container} >
+            
             <TextInput
                 placeholder="email"
                 onChangeText={setUserEmail}
-            ></TextInput>
-            <TextInput 
+                onFocus={() => setEmailAlert(false)}
+            />
+
+            {emailAlert && <Text style={{ color: 'red' }}>Email required</Text>}
+
+            <TextInput
                 placeholder="password"
-                onChangeText={setPassword}></TextInput>
-            <Button title="Log In" onPress={() => handleSubmit(userEmail, password)} />
+                onChangeText={setPassword}
+                onFocus={() => setPasswordAlert(false)}
+            />
+
+            {passwordAlert && <Text style={{ color: 'red' }}>Password required</Text>}
+
+            <Button title="Log In" onPress={() => {
+                if (!userEmail) {
+                    setEmailAlert(true);
+                }
+                if (!password) {
+                    setPasswordAlert(true);
+                }
+                if (userEmail && password) {
+                    handleSubmit(userEmail, password)
+                }
+            }} />
+
             <TouchableOpacity
                 onPress={handleFormChange}>
+
                 <Text>Dont't have account? Sign In</Text>
+
             </TouchableOpacity>
+
         </View>
     )
 };
