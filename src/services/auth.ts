@@ -53,16 +53,29 @@ export const signUp = (name: string, email: string, password: string): void => {
 
 };
 
-export const logIn = (email: String, password: String): Promise<userType> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                name: 'Francisco',
-                email: 'testemail@example.com',
-            },
-            );
-        }, 2000);
-    });
+export const logIn = (email: String, password: String): void => {
+    api.post('/login', { email: email, password: password })
+        .then((response) => {
+            console.log(response.data);
+        })
+        .catch((error) => {
+            if (error.response) {
+                // The request was made and the server responded with a status code that falls out of the range of 2xx
+                console.log("Response received, but with an error status:");
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log("No response received from the server.");
+                console.log(error.request);
+            } else {
+                // Something happened in setting up the request that triggered the error
+                console.log("Error setting up the request:", error.message);
+            }
+            console.log("Deu ruim - Network Error occurred");
+            console.log(error);
+        });
 }
 
 // use here for the sigin or use the provider
