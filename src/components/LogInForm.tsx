@@ -3,13 +3,13 @@ import { View, Text, Button, TextInput, TouchableOpacity, StyleSheet } from 'rea
 
 interface LogInProps {
     handleFormChange: () => void;
-    handleSubmit: (email: String, password: String) => void;
-}
+    handleSubmit: (email: string, password: string) => void;
+};
 
 
 const LogInForm: React.FC<LogInProps> = (props): JSX.Element => {
-    const [userEmail, setUserEmail] = useState<String>('');
-    const [password, setPassword] = useState<String>('');
+    const [userEmail, setUserEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [emailAlert, setEmailAlert] = useState<Boolean>(false);
     const [passwordAlert, setPasswordAlert] = useState<Boolean>(false);
 

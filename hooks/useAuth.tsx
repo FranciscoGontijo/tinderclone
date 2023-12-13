@@ -6,29 +6,39 @@ import api from '../src/services/api';
 
 //change AuthContextType with new user type that has all the information about the user and a token
 
-interface User {
+//use axios to make auth with the new server
+
+//build the fucking server
+
+
+interface userType {
     name: string;
     email: string;
+    likedList: string[];
 }
 
 interface AuthContextType {
     signed: boolean;
-    token: string | null;
-    user: User | null;
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
-    signIn(): Promise<void>;
+    user: userType | null;
+    setUser: React.Dispatch<React.SetStateAction<userType | null>>;
+    signUp(name: string, email: string, password: string): Promise<void>;
+    logIn(email: String, password: String): Promise<void>;
     signOut(): void;
     loading: boolean;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+//great chance that logIn initial value will be wrong
 
 const initialContextValue: AuthContextType = {
     signed: false,
-    token: null,
     user: null,
     setUser: () => { },
-    signIn: async () => { },
+    signUp: async (name: string, email: string, password: string) => { },
+    logIn: async (email: string, password: string) => { },
     signOut: () => { },
     loading: true,
+    setLoading: () => { },
 };
 
 const AuthContext = createContext<AuthContextType>(initialContextValue);
@@ -38,21 +48,33 @@ type AuthProviderProps = {
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<userType | null>(null);
     const [loading, setLoading] = useState(true);
 
 
-    const signIn = async (): Promise<void> => {
-        const response = await auth.signIn();
-        setUser(response.user);
+    const logIn = async (email: string, password: string): Promise<void> => {
+        const response = await auth.logIn(email, password);
+        if (response) {
+            setUser(response);
 
-        api.defaults.headers.Authorization = `Baerer ${response.token}`;
+            console.log(response);
+            await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response));
 
-        console.log(response);
-        await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response.user));
-        await AsyncStorage.setItem('@CloneTinder:token', response.token);
+        } else {
+            console.log('Not working');
+        }
     };
-    
+
+    const signUp = async (name: string, email: string, password: string): Promise<void> => {
+        const response: userType | null = await auth.signUp(name, email, password);
+        if (response) {
+            setUser(response);
+            await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response));
+        } else {
+            console.log('Not working');
+        }
+    };
+
 
     const signOut = async (): Promise<void> => {
         await AsyncStorage.clear();
@@ -63,11 +85,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     useEffect(() => {
         async function loadStorageData() {
             const storagedUser = await AsyncStorage.getItem('@RNAuth:user');
-            const storagedToken = await AsyncStorage.getItem('@RNAuth:token');
 
-            if (storagedUser && storagedToken) {
+            if (storagedUser) {
                 setUser(JSON.parse(storagedUser));
-                api.defaults.headers.Authorization = `Baerer ${storagedToken}`;
             }
             setLoading(false);
         };
@@ -89,11 +109,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         <AuthContext.Provider value={{
             user,
             setUser,
-            token: '',
             signed: Boolean(user),
-            signIn,
+            signUp,
+            logIn,
             signOut,
             loading,
+            setLoading
         }}>
             {children}
         </AuthContext.Provider>

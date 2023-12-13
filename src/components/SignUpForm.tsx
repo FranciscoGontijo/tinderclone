@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, Button, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-interface SignInPropsType {
+
+interface SignUpPropsType {
     handleFormChange: () => void;
-    handleSubmit: (name: String, email: String, password: String) => void;
+    handleSubmit: (name: string, email: string, password: string) => void;
 }
 
-const SignInForm: React.FC<SignInPropsType> = (props): JSX.Element => {
-    const [userName, setUserName] = useState<String>('')
-    const [userEmail, setUserEmail] = useState<String>('');
-    const [password, setPassword] = useState<String>('');
+const SignUpForm: React.FC<SignUpPropsType> = (props): JSX.Element => {
+    const [userName, setUserName] = useState<string>('')
+    const [userEmail, setUserEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [userNameAlert, setUserNameAlert] = useState<Boolean>(false);
     const [emailAlert, setEmailAlert] = useState<Boolean>(false);
     const [passwordAlert, setPasswordAlert] = useState<Boolean>(false);
@@ -69,7 +70,7 @@ const SignInForm: React.FC<SignInPropsType> = (props): JSX.Element => {
     )
 };
 
-export default SignInForm;
+export default SignUpForm;
 
 const styles = StyleSheet.create({
     container: {

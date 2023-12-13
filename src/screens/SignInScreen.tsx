@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet } from 'react-native';
 import useAuth from '../../hooks/useAuth';
-import * as auth from '../services/auth';
 
 import LogInForm from '../components/LogInForm';
-import SignInForm from '../components/SignInForm';
+import SignUpForm from '../components/SignUpForm';
 
 
 
 const SignInScreen: React.FC = () => {
-
-    const [formType, setFormType] = useState<String>('login');
-
-    const { user, signed, logIn } = useAuth();
+    const [formType, setFormType] = useState<string>('login');
+    const { logIn, signUp, setLoading } = useAuth();
 
     const handleFormChange = () => {
         //change form when press button. if login go to signin if signin go to login
@@ -22,21 +18,18 @@ const SignInScreen: React.FC = () => {
         } else {
             setFormType('login');
         }
-        console.log(formType);
     };
 
-    // console.log(signed);
-    // console.log(user);
-    const handleLogIn = (email: String, password: String): void => {
-        // try to log in
-        logIn(email, password);
-        console.log(email);
-        console.log(password);
+    const handleLogIn = async (email: string, password: string): Promise<void> => {
+        setLoading(true);
+        await logIn(email, password);
+        setLoading(false);
     }
 
-    const handleSignIn = (name: String, email: String, password: String): void => {
-
-        // try to sign in
+    const handleSignUp = async (name: string, email: string, password: string): Promise<void> => {
+        setLoading(true)
+        await signUp(name, email, password);
+        setLoading(false);
     };
 
     return (
@@ -44,9 +37,9 @@ const SignInScreen: React.FC = () => {
             {formType === 'login' && <LogInForm
                 handleFormChange={handleFormChange}
                 handleSubmit={handleLogIn} />}
-            {formType === 'signin' && <SignInForm
+            {formType === 'signin' && <SignUpForm
                 handleFormChange={handleFormChange}
-                handleSubmit={handleSignIn} />}
+                handleSubmit={handleSignUp} />}
         </View>
     )
 };
