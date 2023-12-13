@@ -26,9 +26,9 @@ export const signUp = async (name: string, email: string, password: string): Pro
 };
 
 
-export const logIn = (email: string, password: string): userType | null => {
+export const logIn = async (email: string, password: string): Promise<userType | null> => {
     let user: userType | null = null
-    api.post('/login', { email: email, password: password })
+    await api.post('/login', { email: email, password: password })
         .then((response) => {
             user = response.data
         })
