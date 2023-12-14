@@ -1,6 +1,6 @@
 import api from "./api";
 
-type userType = {
+export type userType = {
     name: string;
     email: string;
     likedList: string[];
@@ -36,7 +36,7 @@ export const logIn = async (email: string, password: string): Promise<userType |
             console.log(error.message);
         });
     return user;
-}
+};
 
 // use here for the sigin or use the provider
 

@@ -1,16 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView, Text, Button, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons, AntDesign, Entypo } from '@expo/vector-icons';
+import api from '../services/api';
+import { userType } from '../services/auth';
 
 import { dummyData } from '../data/data';
 
 import useAuth from '../../hooks/useAuth';
 import Swiper from 'react-native-deck-swiper';
 
-const HomeScreen = () => {
+const HomeScreen: React.FC = () => {
     const navigation = useNavigation();
-    const { signOut } = useAuth();
+    const { user, signOut } = useAuth();
+    const controller = new AbortController();
+
+    const [userList, setUserList] = useState<userType[] | null>(null);
+    const [loading, setLoading] = useState<Boolean>(true);
+
+    useEffect(() => {
+        const fetchUserList = async () => {
+            try {
+                const response = await api.get('/userlist', {
+                    signal: controller.signal
+                });
+                setUserList(response.data);
+                setLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        setLoading(true);
+        fetchUserList();
+
+        return () => {
+            controller.abort();
+        }
+    }, []);
 
     const likeUser = (cardIndex: number) => {
         let { id } = dummyData[cardIndex]
@@ -41,6 +67,10 @@ const HomeScreen = () => {
 
             </View>
 
+            <View>
+                <Text>{user?.name}</Text>
+            </View>
+
             <View style={styles.cardsContainer}>
                 <Swiper
                     containerStyle={{ backgroundColor: 'transparent' }}
@@ -50,8 +80,8 @@ const HomeScreen = () => {
                     renderCard={(card) => {
                         return (
                             <View key={card.id} style={styles.card}>
-                                <Image 
-                                    source={{uri: card.photoURL}}
+                                <Image
+                                    source={{ uri: card.photoURL }}
                                     resizeMode="cover"
                                     style={styles.cardImage} />
                                 <Text>{card.firstName}</Text>
