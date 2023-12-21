@@ -25,17 +25,22 @@ export const signUp = async (name: string, email: string, password: string): Pro
     return user;
 };
 
-
-export const logIn = async (email: string, password: string): Promise<userType | null> => {
+type LoginType = {
+    token: string | null,
+    user: userType | null
+}
+export const logIn = async (email: string, password: string): Promise<LoginType | null> => {
+    let token: string | null = null
     let user: userType | null = null
     await api.post('/login', { email: email, password: password })
         .then((response) => {
-            user = response.data
+            token = response.data.accessToken;  
+            user = response.data.user
         })
         .catch((error) => {
             console.log(error.message);
         });
-    return user;
+    return {token, user};
 };
 
 // use here for the sigin or use the provider

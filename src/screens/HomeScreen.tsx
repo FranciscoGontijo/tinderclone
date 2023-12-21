@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView, Text, Button, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons, AntDesign, Entypo } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import { userType } from '../services/auth';
 
@@ -12,7 +12,7 @@ import Swiper from 'react-native-deck-swiper';
 
 const HomeScreen: React.FC = () => {
     const navigation = useNavigation();
-    const { user, signOut } = useAuth();
+    const { user, signOut, token } = useAuth();
     const controller = new AbortController();
 
     const [userList, setUserList] = useState<userType[] | null>(null);
@@ -22,22 +22,31 @@ const HomeScreen: React.FC = () => {
         const fetchUserList = async () => {
             try {
                 const response = await api.get('/userlist', {
-                    signal: controller.signal
+                    signal: controller.signal,
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
                 });
                 setUserList(response.data);
                 setLoading(false);
             } catch (error) {
-                console.log(error);
+                console.log(error); 
             }
         };
         setLoading(true);
         fetchUserList();
+        console.log(token);
+        console.log(userList);
 
         return () => {
             controller.abort();
         }
     }, []);
 
+    //set loading true until userlist is returned
+    //when userlist !== null, render userlist with swiper
+
+    //Change likeUser to create the matching algorithm
     const likeUser = (cardIndex: number) => {
         let { id } = dummyData[cardIndex]
         console.log("Liked " + id)
@@ -65,10 +74,6 @@ const HomeScreen: React.FC = () => {
                     <Ionicons name="chatbubbles-sharp" size={30} color="#FF5864" />
                 </TouchableOpacity>
 
-            </View>
-
-            <View>
-                <Text>{user?.name}</Text>
             </View>
 
             <View style={styles.cardsContainer}>
