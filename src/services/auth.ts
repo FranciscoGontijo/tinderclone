@@ -3,7 +3,9 @@ import api from "./api";
 export type userType = {
     name: string;
     email: string;
+    photoUrl: string;
     likedList: string[];
+    _id: string;
 }
 
 

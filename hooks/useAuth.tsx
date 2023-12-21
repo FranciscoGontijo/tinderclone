@@ -14,6 +14,8 @@ interface userType {
     name: string;
     email: string;
     likedList: string[];
+    _id: string;
+    photoUrl: string;
 }
 
 interface AuthContextType {
