@@ -30,7 +30,7 @@ const HomeScreen: React.FC = () => {
                 setUserList(response.data);
                 setLoading(false);
             } catch (error) {
-                console.log(error); 
+                console.log(error);
             }
         };
         setLoading(true);
@@ -47,19 +47,26 @@ const HomeScreen: React.FC = () => {
     //when userlist !== null, render userlist with swiper
 
     //Change likeUser to create the matching algorithm
+
     const likeUser = (cardIndex: number) => {
-        let { id } = dummyData[cardIndex]
-        console.log("Liked " + id)
+        if (userList) {
+            let { _id } = userList[cardIndex];
+            console.log("Liked " + _id)
+        };
     }
+
+    //Need to check what to do with Id
+    //Need the Id to create the liked list and the matching algorithm
 
     return (
         <SafeAreaView>
             <View style={styles.header}>
 
                 <TouchableOpacity onPress={signOut} >
-                    <Image
+                    {user && <Image
                         style={styles.profileImage}
-                        source={require('../../assets/profile.jpg')} />
+                        source={{ uri: user.photoUrl }} />
+                    }
                 </TouchableOpacity>
 
                 <TouchableOpacity>
@@ -77,23 +84,24 @@ const HomeScreen: React.FC = () => {
             </View>
 
             <View style={styles.cardsContainer}>
-                <Swiper
-                    containerStyle={{ backgroundColor: 'transparent' }}
-                    cards={dummyData}
-                    verticalSwipe={false}
-                    onSwipedRight={(card) => likeUser(card)}
-                    renderCard={(card) => {
-                        return (
-                            <View key={card.id} style={styles.card}>
-                                <Image
-                                    source={{ uri: card.photoURL }}
-                                    resizeMode="cover"
-                                    style={styles.cardImage} />
-                                <Text>{card.firstName}</Text>
-                            </View>
-                        )
-                    }}
-                />
+                {userList &&
+                    <Swiper
+                        containerStyle={{ backgroundColor: 'transparent' }}
+                        cards={userList}
+                        verticalSwipe={false}
+                        onSwipedRight={(card) => likeUser(card)}
+                        renderCard={(card) => {
+                            return (
+                                <View key={card._id} style={styles.card}>
+                                    <Image
+                                        source={{ uri: card.photoUrl }}
+                                        resizeMode="cover"
+                                        style={styles.cardImage} />
+                                    <Text>{card.name}</Text>
+                                </View>
+                            )
+                        }}
+                    />}
             </View>
 
         </SafeAreaView>
