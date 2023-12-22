@@ -48,12 +48,26 @@ const HomeScreen: React.FC = () => {
 
     //Change likeUser to create the matching algorithm
 
-    const likeUser = (cardIndex: number) => {
+    const likeUser = async (cardIndex: number) => {
         if (userList) {
-            let { _id } = userList[cardIndex];
-            console.log("Liked " + _id)
+            let { _id, likedList } = userList[cardIndex];
+
+            const response = await api.put(`/likeuser/${_id}`, {}, {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                }
+            });
+
+            //Open chat with the liked user if your ID is at they liked list
+            if (user) {
+                const check = likedList.includes(user._id);
+                console.log(check);
+                navigation.navigate('Chat');
+            }
+
+            console.log("Liked " + _id);
         };
-    }
+    };
 
     //Need to check what to do with Id
     //Need the Id to create the liked list and the matching algorithm
