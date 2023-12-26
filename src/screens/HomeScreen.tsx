@@ -5,8 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import { userType } from '../services/auth';
 
-import { dummyData } from '../data/data';
-
 import useAuth from '../../hooks/useAuth';
 import Swiper from 'react-native-deck-swiper';
 
@@ -35,8 +33,6 @@ const HomeScreen: React.FC = () => {
         };
         setLoading(true);
         fetchUserList();
-        console.log(token);
-        console.log(userList);
 
         return () => {
             controller.abort();
@@ -57,12 +53,11 @@ const HomeScreen: React.FC = () => {
                     'Authorization': 'Bearer ' + token,
                 }
             });
-
+            console.log(response.data);
             //Open chat with the liked user if your ID is at they liked list
             if (user) {
                 const check = likedList.includes(user._id);
-                console.log(check);
-                navigation.navigate('Chat');
+                if (check) navigation.navigate('Matched');
             }
 
             console.log("Liked " + _id);
@@ -91,7 +86,7 @@ const HomeScreen: React.FC = () => {
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
+                <TouchableOpacity onPress={() => navigation.navigate('Matched')}>
                     <Ionicons name="chatbubbles-sharp" size={30} color="#FF5864" />
                 </TouchableOpacity>
 
