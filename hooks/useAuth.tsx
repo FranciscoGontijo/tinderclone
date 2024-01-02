@@ -2,13 +2,7 @@ import React, { createContext, useContext, ReactNode, useState, useEffect } from
 import { View, ActivityIndicator } from 'react-native';
 import * as auth from '../src/services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-//build the fucking server
-
-//Change user to token... need to retrive user name and liked list. 
-//Create a matched list as well, faster to retrive than to make the hole logic of matching and retriving the chat list
-
-
+import io, { Socket } from 'socket.io-client';
 
 interface userType {
     name: string;
@@ -28,9 +22,8 @@ interface AuthContextType {
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     token: string | null;
+    socket: Socket | null;
 };
-
-//great chance that logIn initial value will be wrong
 
 const initialContextValue: AuthContextType = {
     signed: false,
@@ -41,7 +34,8 @@ const initialContextValue: AuthContextType = {
     signOut: () => { },
     loading: true,
     setLoading: () => { },
-    token: null
+    token: null,
+    socket: null
 };
 
 const AuthContext = createContext<AuthContextType>(initialContextValue);
@@ -54,10 +48,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<userType | null>(null);
     const [token,setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [socket, setSocket] = useState<Socket | null>(null);
 
 
     const logIn = async (email: string, password: string): Promise<void> => {
-        const response = await auth.logIn(email, password);
+        const response: auth.LoginType | null = await auth.logIn(email, password);
         if (response) {
             setToken(response.token);
             setUser(response.user);
@@ -69,10 +64,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    //Pass token when signUp
     const signUp = async (name: string, email: string, password: string): Promise<void> => {
-        const response: userType | null = await auth.signUp(name, email, password);
+        const response: auth.LoginType | null = await auth.signUp(name, email, password);
         if (response) {
-            setUser(response);
+            setUser(response.user);
+            setToken(response.token);
             await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response));
         } else {
             console.log('Not working');
@@ -83,6 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const signOut = async (): Promise<void> => {
         await AsyncStorage.clear();
         setUser(null);
+        setToken(null);
     };
 
 
@@ -119,7 +117,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             signOut,
             loading,
             setLoading,
-            token
+            token,
+            socket,
         }}>
             {children}
         </AuthContext.Provider>
