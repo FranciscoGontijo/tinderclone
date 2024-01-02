@@ -3,8 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { View, Text, ImageBackground, TouchableOpacity, StyleSheet } from 'react-native';
 import useAuth from '../../hooks/useAuth';
 
-const LoginScreen = () => {
-  const { user, setUser } = useAuth();
+const LoginScreen: React.FC = () => {
 
   const navigation = useNavigation();
 

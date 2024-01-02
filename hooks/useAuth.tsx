@@ -18,7 +18,7 @@ interface AuthContextType {
     setUser: React.Dispatch<React.SetStateAction<userType | null>>;
     signUp(name: string, email: string, password: string): Promise<void>;
     logIn(email: string, password: string): Promise<void>;
-    signOut(): void;
+    logOut(): void;
     loading: boolean;
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     token: string | null;
@@ -31,7 +31,7 @@ const initialContextValue: AuthContextType = {
     setUser: () => { },
     signUp: async (name: string, email: string, password: string) => { },
     logIn: async (email: string, password: string) => { },
-    signOut: () => { },
+    logOut: () => { },
     loading: true,
     setLoading: () => { },
     token: null,
@@ -46,7 +46,7 @@ type AuthProviderProps = {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<userType | null>(null);
-    const [token,setToken] = useState<string | null>(null);
+    const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
 
-    const signOut = async (): Promise<void> => {
+    const logOut = async (): Promise<void> => {
         await AsyncStorage.clear();
         setUser(null);
         setToken(null);
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             signed: Boolean(user),
             signUp,
             logIn,
-            signOut,
+            logOut,
             loading,
             setLoading,
             token,

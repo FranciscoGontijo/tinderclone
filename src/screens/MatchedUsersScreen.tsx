@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, SafeAreaView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, FlatList, SafeAreaView, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -18,7 +18,7 @@ const MatchedUsersScreen: React.FC = () => {
 
     const navigation = useNavigation();
     const controller = new AbortController();
-    const { user, signOut, token } = useAuth();
+    const { user, logOut, token } = useAuth();
 
 
     //import matched list and display as a flat list with last message displayed underneath the user name
@@ -38,7 +38,7 @@ const MatchedUsersScreen: React.FC = () => {
                 console.log(error);
             }
         };
-        //setLoading(true);
+        setLoading(true);
         fetchMatchedUsersList();
 
         return () => {
@@ -46,12 +46,19 @@ const MatchedUsersScreen: React.FC = () => {
         }
     }, []);
 
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#666" />
+            </View>
+        );
+    };
 
     return (
         <SafeAreaView>
             <View style={styles.header}>
 
-                <TouchableOpacity onPress={signOut} >
+                <TouchableOpacity onPress={logOut} >
                     {user && <Image
                         style={styles.profileImage}
                         source={{ uri: user.photoUrl }} />

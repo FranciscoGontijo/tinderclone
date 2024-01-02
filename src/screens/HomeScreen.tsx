@@ -10,7 +10,7 @@ import Swiper from 'react-native-deck-swiper';
 
 const HomeScreen: React.FC = () => {
     const navigation = useNavigation();
-    const { user, signOut, token } = useAuth();
+    const { user, logOut, token } = useAuth();
     const controller = new AbortController();
 
     const [userList, setUserList] = useState<userType[] | null>(null);
@@ -71,7 +71,7 @@ const HomeScreen: React.FC = () => {
         <SafeAreaView>
             <View style={styles.header}>
 
-                <TouchableOpacity onPress={signOut} >
+                <TouchableOpacity onPress={logOut} >
                     {user && <Image
                         style={styles.profileImage}
                         source={{ uri: user.photoUrl }} />
