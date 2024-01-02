@@ -70,7 +70,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (response) {
             setUser(response.user);
             setToken(response.token);
-            await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response));
+            response.user && await AsyncStorage.setItem('@CloneTinder:user', JSON.stringify(response.user));
+            response.token && await AsyncStorage.setItem('@CloneTinder:token', response.token);
         } else {
             console.log('Not working');
         }
@@ -86,10 +87,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     useEffect(() => {
         async function loadStorageData() {
-            const storagedUser = await AsyncStorage.getItem('@RNAuth:user');
+            const storagedUser = await AsyncStorage.getItem('@CloneTinder:user');
+            const storageToken = await AsyncStorage.getItem('@CloneTinder:token');
 
-            if (storagedUser) {
+            if (storagedUser && storageToken) {
                 setUser(JSON.parse(storagedUser));
+                setToken(storageToken);
             }
             setLoading(false);
         };
