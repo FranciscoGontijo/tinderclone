@@ -100,6 +100,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loadStorageData();
     }, []);
 
+    useEffect(() => {
+        if (user) {
+            const newSocket = io("http://192.168.1.107:8080");
+            setSocket(newSocket);
+
+            newSocket.emit('login', user._id.toString());
+        }
+        
+        return () => {
+            if (socket) {
+                socket.disconnect(); // Disconnect the socket when the component unmounts
+            }
+        };
+    }, [user]);
+
 
     if (loading) {
         return (
