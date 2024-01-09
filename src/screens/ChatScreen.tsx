@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../services/api';
 import useAuth from '../../hooks/useAuth';
 
-
 type MessageType = {
     name: string,
     message: string,
@@ -41,6 +40,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         chatRef.current = chat;
     }, [chat]);
 
+
     const updateChatAtDatabase = async (updatedChat: MessageType[]) => {
         try {
             console.log('Trying to update:');
@@ -52,7 +52,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 }
             });
             console.log(response.data); // Assuming you want to return something from the API call
-        } catch (error) {
+        } catch (error: any) {
             if (error.name === 'AbortError') {
                 // Handle the cancellation error if needed
                 console.log('Request canceled:', error.message);
@@ -63,20 +63,17 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 // Handle other API errors
                 console.log('API error:', error.message);
             }
-            // Prevent unhandled promise rejections by catching and handling the error
-            // You can choose to handle it here or rethrow it to be caught elsewhere
         }
     };
 
-    const updateChatMessages = () => {
-        
-        const performUpdate = () => {
+    const startDatabaseUpdates = () => {
+        if (chatRef.current.length > 0) {
             let newChatArray = chatRef.current;
-            updateChatAtDatabase(newChatArray); // Pass the updated chat array
-            updateChatTimeout = setTimeout(() => performUpdate(), 20000);
-        };
-
-        performUpdate();
+            updateChatAtDatabase(newChatArray);
+        } else {
+            console.log('Chat array is empty, not gonna update');
+        }
+        updateChatTimeout = setTimeout(() => startDatabaseUpdates(), 20000);
     };
 
     useEffect(() => {
@@ -97,7 +94,9 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 throw error;
             }
         };
+
         setLoading(true);
+        
         fetchChatMessages();
 
         //Use socket.io to handle messages
@@ -108,11 +107,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         });
 
         //Start timer
-        updateChatMessages();
+        startDatabaseUpdates();
+
+        const cleanup = async () => {
+            await updateChatAtDatabase(chatRef.current);
+            controller.abort();
+            clearTimeout(updateChatTimeout);
+          };
 
         return () => {
-            controller.abort();
-            clearTimeout(updateChatTimeout); // Clear the timeout when the component unmounts
+           cleanup();
         };
 
     }, []);
