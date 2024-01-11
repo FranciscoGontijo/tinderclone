@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, FlatList, SafeAreaView, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, SafeAreaView, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,8 +9,14 @@ import useAuth from '../../hooks/useAuth';
 type MatchedUserType = {
     name: string;
     photoUrl: string;
-    _id: string
+    _id: string,
+    lastMessage: {
+        message: string,
+        sender: string
+    },
 }
+
+//Need to get last message with the matcheduser
 
 const MatchedUsersScreen: React.FC = () => {
     const [matchedList, setMatchedList] = useState<MatchedUserType[] | null>(null);
@@ -20,8 +26,6 @@ const MatchedUsersScreen: React.FC = () => {
     const controller = new AbortController();
     const { user, logOut, token } = useAuth();
 
-
-    //import matched list and display as a flat list with last message displayed underneath the user name
     useEffect(() => {
         const fetchMatchedUsersList = async () => {
             try {
@@ -31,7 +35,6 @@ const MatchedUsersScreen: React.FC = () => {
                         'Authorization': 'Bearer ' + token
                     }
                 });
-                console.log(response.data);
                 setMatchedList(response.data);
                 setLoading(false);
             } catch (error) {
@@ -82,12 +85,25 @@ const MatchedUsersScreen: React.FC = () => {
             {matchedList && <FlatList
                 data={matchedList}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('Chat', { userId: item._id})}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Chat', { userId: item._id })}>
                         <View style={styles.chatContainer}>
+
                             <Image
                                 style={styles.chatImage}
-                                source={{ uri: item.photoUrl }} />
-                            <Text>{item.name}</Text>
+                                source={{ uri: item.photoUrl }}
+                            />
+
+                            <View style={styles.chatTextContainer}>
+
+                                <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+
+                                <View style={styles.lastMessageContainer}>
+                                    {item.lastMessage.sender !== user?._id ? <Ionicons name="return-up-forward-outline" size={20} color="#666" /> : <Ionicons name="return-up-back-outline" size={20} color="#666" />}
+                                    <Text>{item.lastMessage.message}</Text>
+                                </View>
+
+                            </View>
+
                         </View>
                     </TouchableOpacity>
                 )} />}
@@ -128,5 +144,14 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         marginLeft: 20
+    },
+    chatTextContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+
+    },
+    lastMessageContainer: {
+        display: 'flex',
+        flexDirection: 'row',
     }
 });
