@@ -26,6 +26,8 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     const { user, logOut, token, socket } = useAuth();
 
     const chatRef = useRef(chat);
+    
+    let messagesCounter = 0;
 
     const { userId } = route.params;
 
@@ -43,8 +45,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
     const updateChatAtDatabase = async (updatedChat: MessageType[]) => {
         try {
-            console.log('Trying to update:');
-            console.log(updatedChat);
             const response = await api.post(`/chatupdate/${userId}`, { chat: updatedChat }, {
                 signal: controller.signal,
                 headers: {
@@ -67,11 +67,14 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     };
 
     const startDatabaseUpdates = () => {
-        if (chatRef.current.length > 0) {
+        //create an if that check if there is new messages
+        if (chatRef.current.length > messagesCounter) {
             let newChatArray = chatRef.current;
             updateChatAtDatabase(newChatArray);
+            console.log('ChatRef: ', chatRef.current.length, 'MessagesCounter: ', messagesCounter );
+            messagesCounter = chatRef.current.length;
         } else {
-            console.log('Chat array is empty, not gonna update');
+            console.log('Not new messages, not gonna update');
         }
         updateChatTimeout = setTimeout(() => startDatabaseUpdates(), 20000);
     };
