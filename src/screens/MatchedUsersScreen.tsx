@@ -13,10 +13,9 @@ type MatchedUserType = {
     lastMessage: {
         message: string,
         sender: string
-    },
+    }
 }
 
-//Need to get last message with the matcheduser
 
 const MatchedUsersScreen: React.FC = () => {
     const [matchedList, setMatchedList] = useState<MatchedUserType[] | null>(null);
@@ -57,6 +56,9 @@ const MatchedUsersScreen: React.FC = () => {
         );
     };
 
+    //Real time update last message
+
+
     return (
         <SafeAreaView>
             <View style={styles.header}>
@@ -95,12 +97,21 @@ const MatchedUsersScreen: React.FC = () => {
 
                             <View style={styles.chatTextContainer}>
 
-                                <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+                                <Text style={{ fontWeight: 'bold', marginLeft: 20, fontSize: 20, width: '100%' }}>{item.name}</Text>
 
-                                <View style={styles.lastMessageContainer}>
-                                    {item.lastMessage.sender !== user?._id ? <Ionicons name="return-up-forward-outline" size={20} color="#666" /> : <Ionicons name="return-up-back-outline" size={20} color="#666" />}
-                                    <Text>{item.lastMessage.message}</Text>
-                                </View>
+                                {item.lastMessage.message === 'No messages yet' ?
+                                    <View>
+                                        <Text style={{ marginLeft: 40, fontSize: 18, color: "#666", marginTop: 10,}}>Say hello!</Text>
+                                    </View>
+                                    :
+                                    <View style={styles.lastMessageContainer}>
+                                        {item.lastMessage.sender !== user?._id ? <Ionicons name="return-down-forward-outline" size={30} color="#666" /> : <Ionicons name="return-up-back-outline" size={30} color="#666" />}
+                                        <Text 
+                                        style={{ marginLeft: 10, fontSize: 18, color: "#666", maxWidth: 250 }}
+                                        ellipsizeMode='tail'
+                                        numberOfLines={1}>{item.lastMessage.message}</Text>
+                                    </View>
+                                }
 
                             </View>
 
@@ -133,25 +144,32 @@ const styles = StyleSheet.create({
         width: 40,
     },
     chatContainer: {
-        height: 60,
-        border: '1px solid black',
+        height: 90,
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 30,
+        marginTop: 15,
     },
     chatImage: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         marginLeft: 20
     },
     chatTextContainer: {
         display: 'flex',
         flexDirection: 'column',
+        borderBottomWidth: 1.5,
+        borderColor: '#666',
+        width: '100%',
+        overflow: 'hidden',
 
     },
     lastMessageContainer: {
         display: 'flex',
         flexDirection: 'row',
+        marginLeft: 20,
+        paddingTop: 5,
+        width: '80%',
     }
 });
+

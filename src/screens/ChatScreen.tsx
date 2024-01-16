@@ -26,12 +26,12 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     const { user, logOut, token, socket } = useAuth();
 
     const chatRef = useRef(chat);
-    
-    let messagesCounter = 0;
+
+    let messagesCounter: number = 0;
 
     const { userId } = route.params;
 
-    const roomId = [user?._id.toString(), userId].sort().join('-');
+    const roomId: string = [user?._id.toString(), userId].sort().join('-');
 
     const navigation = useNavigation();
     const controller = new AbortController();
@@ -71,7 +71,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         if (chatRef.current.length > messagesCounter) {
             let newChatArray = chatRef.current;
             updateChatAtDatabase(newChatArray);
-            console.log('ChatRef: ', chatRef.current.length, 'MessagesCounter: ', messagesCounter );
             messagesCounter = chatRef.current.length;
         } else {
             console.log('Not new messages, not gonna update');
@@ -80,7 +79,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     };
 
     useEffect(() => {
-        //get messages and update chat array using userId and likedUserId
+
         const fetchChatMessages = async () => {
             try {
                 const response = await api.get(`/chat/${userId}`, {
@@ -97,9 +96,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 throw error;
             }
         };
-
         setLoading(true);
-        
         fetchChatMessages();
 
         //Use socket.io to handle messages
@@ -116,10 +113,10 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
             await updateChatAtDatabase(chatRef.current);
             controller.abort();
             clearTimeout(updateChatTimeout);
-          };
+        };
 
         return () => {
-           cleanup();
+            cleanup();
         };
 
     }, []);
@@ -165,18 +162,20 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
             {chat && <FlatList
                 data={chat}
                 renderItem={({ item }) => {
+                    //you can update the variable here to create the blocks.
+                    // if message is from the same user that last message was. push inside a block
+                    //render the block instead of the item.message
+
                     if (user?._id === item.userId) {
                         return (
-                            <View>
-                                <Text style={{ alignSelf: 'flex-end' }}>{item.name}</Text>
-                                <Text style={{ alignSelf: 'flex-end' }}>{item.message}</Text>
+                            <View style={styles.chatBubbleRight}>
+                                <Text style={styles.chatText}>{item.message}</Text>
                             </View>
                         )
                     } else {
                         return (
-                            <View>
-                                <Text style={{ alignSelf: 'flex-start' }}>{item.name}</Text>
-                                <Text style={{ alignSelf: 'flex-start' }}>{item.message}</Text>
+                            <View style={styles.chatBubbleLeft}>
+                                <Text style={styles.chatText}>{item.message}</Text>
                             </View>
                         )
                     }
@@ -186,6 +185,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
                 <TextInput
                     style={styles.textInput}
+                    multiline={true}
                     onChangeText={setNewMessage}
                     value={newMessage}
                     onSubmitEditing={() => sendMessage()}
@@ -216,11 +216,40 @@ const styles = StyleSheet.create({
         height: 45,
         width: 40,
     },
+    chatText: {
+        fontSize: 16,
+    },
+    chatBubbleRight: {
+        backgroundColor: 'lightblue',
+        borderBottomRightRadius: 2,
+        borderTopRightRadius: 10,
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 10,
+        marginBottom: 4,
+        marginRight: 14,
+        marginLeft: 44,
+        alignSelf: 'flex-end',
+        padding: 5,
+
+    },
+    chatBubbleLeft: {
+        backgroundColor: 'lightgray',
+        borderBottomRightRadius: 10,
+        borderTopRightRadius: 10,
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 2,
+        marginBottom: 4,
+        marginLeft: 14,
+        marginRight: 44,
+        alignSelf: 'flex-start',
+        padding: 5,
+    },
     textInput: {
-        height: 30,
+        height: 36,
         width: '100%',
         borderWidth: 1,
-        borderRadius: 15,
-        paddingLeft: 10,
+        borderRadius: 18,
+        padding: 10,
+        fontSize: 16,
     }
 });
