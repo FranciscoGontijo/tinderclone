@@ -3,19 +3,11 @@ import { View, Text, FlatList, SafeAreaView, Image, StyleSheet, TouchableOpacity
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-import api from '../services/api';
+import { fetchMatchedUsersList, MatchedUserType } from '../services/api';
 import useAuth from '../../hooks/useAuth';
 
-type MatchedUserType = {
-    name: string;
-    photoUrl: string;
-    _id: string,
-    lastMessage: {
-        message: string,
-        sender: string
-    }
-}
-
+//import components
+import Header from '../components/Header';
 
 const MatchedUsersScreen: React.FC = () => {
     const [matchedList, setMatchedList] = useState<MatchedUserType[] | null>(null);
@@ -23,30 +15,18 @@ const MatchedUsersScreen: React.FC = () => {
 
     const navigation = useNavigation();
     const controller = new AbortController();
-    const { user, logOut, token } = useAuth();
+    const { user, token } = useAuth();
 
     useEffect(() => {
-        const fetchMatchedUsersList = async () => {
-            try {
-                const response = await api.get('/matchedlist', {
-                    signal: controller.signal,
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                });
-                setMatchedList(response.data);
-                setLoading(false);
-            } catch (error) {
-                console.log(error);
-            }
-        };
+        
         setLoading(true);
-        fetchMatchedUsersList();
+        fetchMatchedUsersList(controller, token, setMatchedList, setLoading);
 
         return () => {
             controller.abort();
         }
     }, []);
+
 
     if (loading) {
         return (
@@ -55,34 +35,11 @@ const MatchedUsersScreen: React.FC = () => {
             </View>
         );
     };
-
-    //Real time update last message
-
-
+    
     return (
         <SafeAreaView>
-            <View style={styles.header}>
 
-                <TouchableOpacity onPress={logOut} >
-                    {user && <Image
-                        style={styles.profileImage}
-                        source={{ uri: user.photoUrl }} />
-                    }
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Image
-                        source={require('../../assets/logo.png')}
-                        style={styles.logoImage}
-                        resizeMode="contain"
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate('Matched')}>
-                    <Ionicons name="chatbubbles-sharp" size={30} color="#FF5864" />
-                </TouchableOpacity>
-
-            </View>
+            <Header />
 
             {matchedList && <FlatList
                 data={matchedList}
@@ -125,24 +82,7 @@ const MatchedUsersScreen: React.FC = () => {
 
 export default MatchedUsersScreen;
 
-
 const styles = StyleSheet.create({
-    profileImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-    },
-    header: {
-        height: 70,
-        marginTop: 25,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 10,
-    },
-    logoImage: {
-        height: 45,
-        width: 40,
-    },
     chatContainer: {
         height: 90,
         display: 'flex',
