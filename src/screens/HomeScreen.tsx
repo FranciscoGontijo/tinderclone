@@ -1,96 +1,59 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { SafeAreaView, Text, Button, View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, Text, View, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import api from '../services/api';
-import { userType } from '../services/auth';
+import { fetchUserList, likeUser } from '../services/api';
+import { UserType } from '../services/auth';
 
 import useAuth from '../../hooks/useAuth';
 import Swiper from 'react-native-deck-swiper';
+
+//import components
+import Header from '../components/Header';
 
 const HomeScreen: React.FC = () => {
     const navigation = useNavigation();
     const { user, logOut, token } = useAuth();
     const controller = new AbortController();
 
-    const [userList, setUserList] = useState<userType[] | null>(null);
+    const [userList, setUserList] = useState<UserType[] | null>(null);
     const [loading, setLoading] = useState<Boolean>(true);
 
     useEffect(() => {
-        const fetchUserList = async () => {
-            try {
-                const response = await api.get('/userlist', {
-                    signal: controller.signal,
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                });
-                setUserList(response.data);
-                setLoading(false);
-            } catch (error) {
-                console.log(error);
-            }
-        };
+
         setLoading(true);
-        fetchUserList();
+        fetchUserList(controller, token, setUserList, setLoading);
 
         return () => {
             controller.abort();
         }
     }, []);
 
-    //set loading true until userlist is returned
-    //when userlist !== null, render userlist with swiper
-
-    //Change likeUser to create the matching algorithm
-
-    const likeUser = async (cardIndex: number) => {
+    const handleLike = async (cardIndex: number) => {
         if (userList) {
             let { _id, likedList } = userList[cardIndex];
 
-            const response = await api.put(`/likeuser/${_id}`, {}, {
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                }
-            });
-            console.log(response.data);
-            //Open chat with the liked user if your ID is at they liked list
+            await likeUser(token, _id)
+
             if (user) {
                 const check = likedList.includes(user._id);
-                if (check) navigation.navigate('Matched');
+                if (check) navigation.navigate('Matched' as never);
             }
-
             console.log("Liked " + _id);
         };
     };
 
-    //Need to check what to do with Id
-    //Need the Id to create the liked list and the matching algorithm
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#666" />
+            </View>
+        );
+    };
 
     return (
         <SafeAreaView>
-            <View style={styles.header}>
 
-                <TouchableOpacity onPress={logOut} >
-                    {user && <Image
-                        style={styles.profileImage}
-                        source={{ uri: user.photoUrl }} />
-                    }
-                </TouchableOpacity>
-
-                <TouchableOpacity>
-                    <Image
-                        source={require('../../assets/logo.png')}
-                        style={styles.logoImage}
-                        resizeMode="contain"
-                    />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate('Matched')}>
-                    <Ionicons name="chatbubbles-sharp" size={30} color="#FF5864" />
-                </TouchableOpacity>
-
-            </View>
+            <Header />
 
             <View style={styles.cardsContainer}>
                 {userList &&
@@ -98,7 +61,7 @@ const HomeScreen: React.FC = () => {
                         containerStyle={{ backgroundColor: 'transparent' }}
                         cards={userList}
                         verticalSwipe={false}
-                        onSwipedRight={(card) => likeUser(card)}
+                        onSwipedRight={(card) => handleLike(card)}
                         renderCard={(card) => {
                             return (
                                 <View key={card._id} style={styles.card}>
@@ -106,7 +69,7 @@ const HomeScreen: React.FC = () => {
                                         source={{ uri: card.photoUrl }}
                                         resizeMode="cover"
                                         style={styles.cardImage} />
-                                    <Text>{card.name}</Text>
+                                    <Text style={styles.cardText}>{card.name}</Text>
                                 </View>
                             )
                         }}
@@ -149,5 +112,11 @@ const styles = StyleSheet.create({
     cardImage: {
         height: '80%',
         width: '100%',
+    },
+    cardText: {
+        fontWeight: 'bold',
+        fontSize: 20,
+        marginLeft: 30,
+        marginTop: 10,
     }
 });
