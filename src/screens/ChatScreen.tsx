@@ -1,13 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ActivityIndicator, View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
-import { useNavigation, RouteProp } from '@react-navigation/native';
+import {
+    ActivityIndicator,
+    View,
+    Text,
+    SafeAreaView,
+    StyleSheet,
+    FlatList,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView
+} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { RouteProp } from '@react-navigation/native';
 
 import { MessageType, fetchChatMessages, updateChatAtDatabase } from '../services/api';
 import useAuth from '../../hooks/useAuth';
 
 //import components
 import Header from '../components/Header';
-
 
 type ChatScreenRouteProp = RouteProp<{ Chat: { userId: string } }, 'Chat'>;
 
@@ -30,7 +41,6 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     const { userId } = route.params;
     const roomId: string = [user?._id.toString(), userId].sort().join('-');
 
-    const navigation = useNavigation();
     const controller = new AbortController();
 
     let updateChatTimeout: NodeJS.Timeout;
@@ -45,9 +55,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
             let newChatArray = chatRef.current;
             updateChatAtDatabase(userId, controller, token, newChatArray);
             messagesCounter = chatRef.current.length;
-        } else {
-            console.log('Not new messages, not gonna update');
-        }
+        } 
         updateChatTimeout = setTimeout(() => startDatabaseUpdates(), 20000);
     };
 
@@ -94,7 +102,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1,}}>
 
             <Header />
 
@@ -122,20 +130,23 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                         }
                     }}
                 />}
-                
+
             </View>
 
-            <View>
+            <KeyboardAvoidingView style={styles.textInputContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
 
                 <TextInput
                     style={styles.textInput}
                     onChangeText={setNewMessage}
                     value={newMessage}
                     onSubmitEditing={() => sendMessage()}
-                    placeholder='Send Message'
+                    placeholder='Type a message'
                 />
 
-            </View>
+            </KeyboardAvoidingView>
+
+            <View style={styles.chatFooter} />
+
         </SafeAreaView>
     )
 };
@@ -144,7 +155,9 @@ export default ChatScreen;
 
 const styles = StyleSheet.create({
     chatView: {
-        //Need to apply scroll to chat view and set on max height
+        //Need to apply scroll to chat 
+        flex: 1,
+
     },
     chatText: {
         fontSize: 20,
@@ -174,6 +187,15 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         padding: 5,
     },
+    textInputContainer: {
+        padding: 10,
+        backgroundColor: '#fff',
+        borderColor: '#666',
+        borderTopWidth: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     textInput: {
         height: 36,
         width: '100%',
@@ -181,5 +203,11 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         padding: 10,
         fontSize: 16,
+        alignSelf: 'center',
+    },
+    chatFooter: {
+        height: 36,
+        width: '100%',
+        borderTopWidth: 1,
     }
 });
