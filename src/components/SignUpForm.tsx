@@ -14,58 +14,87 @@ const SignUpForm: React.FC<SignUpPropsType> = (props): JSX.Element => {
     const [userNameAlert, setUserNameAlert] = useState<Boolean>(false);
     const [emailAlert, setEmailAlert] = useState<Boolean>(false);
     const [passwordAlert, setPasswordAlert] = useState<Boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const { handleFormChange, handleSubmit } = props;
 
-    //alert about input field emptyness
+    const togglePasswordView = () => {
+        setShowPassword(!showPassword);
+    }
 
     return (
         <View style={styles.container} >
 
             <View style={styles.inputContainer}>
+
                 <Text style={{ fontSize: 23 }}>Your Name</Text>
+
                 <View style={styles.iconContainer}>
+
                     <Ionicons style={{ marginRight: 4 }} name='person' size={20} />
+
                     <TextInput
                         style={styles.textInput}
                         placeholder='Your name'
                         onChangeText={setUserName}
                         onFocus={() => setUserNameAlert(false)}
                     />
+
                 </View>
+
+                {userNameAlert && <Text style={{ color: 'red' }}>Name required</Text>}
+
             </View>
 
-            {userNameAlert && <Text style={{ color: 'red' }}>Name required</Text>}
-
             <View style={styles.inputContainer}>
+
                 <Text style={{ fontSize: 23 }}>Email Address</Text>
+
                 <View style={styles.iconContainer}>
+
                     <Ionicons style={{ marginRight: 4 }} name='mail-outline' size={20} />
+
                     <TextInput
                         style={styles.textInput}
                         placeholder="youremail@email.com"
                         onChangeText={setUserEmail}
                         onFocus={() => setEmailAlert(false)}
                     />
-                </View>
-            </View>
 
-            {emailAlert && <Text style={{ color: 'red' }}>Email required</Text>}
+                </View>
+
+                {emailAlert && <Text style={{ color: 'red' }}>Email required</Text>}
+
+            </View>
 
             <View style={styles.inputContainer}>
-                <Text style={{ fontSize: 23 }}>Email Address</Text>
-                <View style={styles.iconContainer}>
-                    <Ionicons style={{ marginRight: 4 }} name='lock-closed-outline' size={20} />
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="password"
-                        onChangeText={setPassword}
-                        onFocus={() => setPasswordAlert(false)}
-                    />
-                </View>
-            </View>
 
-            {passwordAlert && <Text style={{ color: 'red' }}>Password required</Text>}
+                <Text style={{ fontSize: 23 }}>Password</Text>
+
+                <View style={styles.passwordContainer}>
+
+                    <View style={styles.iconContainer}>
+                        <Ionicons style={{ marginRight: 4 }} name='lock-closed-outline' size={20} />
+
+                        <TextInput
+                            style={styles.textInput}
+                            secureTextEntry={!showPassword}
+                            placeholder="password"
+                            onChangeText={setPassword}
+                            onFocus={() => setPasswordAlert(false)}
+                        />
+                    </View>
+
+                    {showPassword ?
+                        <Ionicons onPress={togglePasswordView} name='eye' size={20} />
+                        :
+                        <Ionicons onPress={togglePasswordView} name='eye-off' size={20} />}
+
+                </View>
+
+                {passwordAlert && <Text style={{ color: 'red' }}>Password required</Text>}
+
+            </View>
 
             <Pressable style={styles.signInButton} onPress={() => {
                 if (!userName) {
@@ -81,7 +110,7 @@ const SignUpForm: React.FC<SignUpPropsType> = (props): JSX.Element => {
                     handleSubmit(userName, userEmail, password)
                 }
             }} >
-                <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white'  }}>Sign In</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>Sign In</Text>
             </Pressable>
 
             <TouchableOpacity
@@ -116,8 +145,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'pink',
+        width: '100%',
+        justifyContent: 'space-between'
+    },
     textInput: {
-        fontSize: 20
+        fontSize: 20,
     },
     signInButton: {
         height: 50,
