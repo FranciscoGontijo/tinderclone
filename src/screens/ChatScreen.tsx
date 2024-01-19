@@ -18,9 +18,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { MessageType, fetchChatMessages, updateChatAtDatabase } from '../services/api';
 import useAuth from '../../hooks/useAuth';
 
-//import components
-import Header from '../components/Header';
-
 type ChatScreenRouteProp = RouteProp<{ Chat: { userId: string, userName: string, photoUrl: string } }, 'Chat'>;
 
 type ChatScreenProps = {
