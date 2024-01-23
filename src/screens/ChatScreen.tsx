@@ -18,6 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { MessageType, fetchChatMessages, updateChatAtDatabase } from '../services/api';
 import useAuth from '../../hooks/useAuth';
 
+import { useFonts } from 'expo-font';
+
 type ChatScreenRouteProp = RouteProp<{ Chat: { userId: string, userName: string, photoUrl: string } }, 'Chat'>;
 
 type ChatScreenProps = {
@@ -28,8 +30,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     const [chat, setChat] = useState<MessageType[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
     const [loading, setLoading] = useState<Boolean>(true);
+    const [lastMessageSender, setLastMessageSender] = useState<string>('')
     //Auth Hook
     const { user, token, socket } = useAuth();
+
+    //Use fonts
+    const [fontsLoaded] = useFonts({
+        'Montserrat-Regular': require('../../assets/fonts/Montserrat-Regular.ttf'),
+        'Montserrat-Light': require('../../assets/fonts/Montserrat-Light.ttf'),
+        'Montserrat-Medium': require('../../assets/fonts/Montserrat-Medium.ttf'),
+    });
 
     //Use Ref to update database just when needed
     const chatRef = useRef(chat);
@@ -94,7 +104,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         setNewMessage('');
     };
 
-    if (loading) {
+    if (loading || !fontsLoaded) {
         return (
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <ActivityIndicator size="large" color="#666" />
@@ -111,7 +121,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                     style={styles.profileImage}
                     source={{ uri: photoUrl }} />
 
-                <Text style={{ fontSize: 28, fontWeight: 'bold', color:'#67667b' }}>{userName}</Text>
+                <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#67667b' }}>{userName}</Text>
             </View>
 
             <View style={styles.chatView}>
@@ -119,10 +129,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 {chat && <FlatList
                     data={chat}
                     renderItem={({ item }) => {
-                        //you can update the variable here to create the blocks.
-                        // if message is from the same user that last message was. push inside a block
-                        //render the block instead of the item.message
-
+                        
                         if (user?._id === item.userId) {
                             return (
                                 <View style={styles.chatBubbleRight}>
@@ -183,7 +190,8 @@ const styles = StyleSheet.create({
     },
     chatText: {
         fontSize: 20,
-        color: 'white'
+        color: 'white',
+        fontFamily: 'Montserrat-Medium'
     },
     chatBubbleRight: {
         backgroundColor: '#3aa3f2',
