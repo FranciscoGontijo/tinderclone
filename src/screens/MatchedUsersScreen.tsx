@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { fetchMatchedUsersList, MatchedUserType } from '../services/api';
 import useAuth from '../../hooks/useAuth';
+import { useFonts } from 'expo-font';
 
 //import components
 import Header from '../components/Header';
@@ -17,8 +18,14 @@ const MatchedUsersScreen: React.FC = () => {
     const controller = new AbortController();
     const { user, token } = useAuth();
 
+    //Use fonts
+    const [fontsLoaded] = useFonts({
+        'Montserrat-Medium': require('../../assets/fonts/Montserrat-Medium.ttf'),
+        'Quicksand-Bold': require('../../assets/fonts/Quicksand-Bold.ttf')
+    });
+
     useEffect(() => {
-        
+
         setLoading(true);
         fetchMatchedUsersList(controller, token, setMatchedList, setLoading);
 
@@ -28,23 +35,25 @@ const MatchedUsersScreen: React.FC = () => {
     }, []);
 
 
-    if (loading) {
+    if (loading || !fontsLoaded) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View style={{ backgroundColor: '#13101c', flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <ActivityIndicator size="large" color="#666" />
             </View>
         );
     };
-    
+
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#13101c' }}>
 
             <Header />
+
+            <Text style={{ color: '#67667b', fontSize: 20, fontFamily: 'Quicksand-Bold', marginLeft: 20 }}>Messages</Text>
 
             {matchedList && <FlatList
                 data={matchedList}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('Chat', { userId: item._id })}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Chat', { userId: item._id, userName: item.name, photoUrl: item.photoUrl })}>
                         <View style={styles.chatContainer}>
 
                             <Image
@@ -54,19 +63,19 @@ const MatchedUsersScreen: React.FC = () => {
 
                             <View style={styles.chatTextContainer}>
 
-                                <Text style={{ fontWeight: 'bold', marginLeft: 20, fontSize: 20, width: '100%' }}>{item.name}</Text>
+                                <Text style={{ fontFamily: 'Quicksand-Bold', marginLeft: 20, fontSize: 22, width: '100%', color: '#67667b' }}>{item.name}</Text>
 
                                 {item.lastMessage.message === 'No messages yet' ?
                                     <View>
-                                        <Text style={{ marginLeft: 40, fontSize: 18, color: "#666", marginTop: 10,}}>Say hello!</Text>
+                                        <Text style={{ marginLeft: 40, fontSize: 18, color: "#67667b", marginTop: 10, }}>Say hello!</Text>
                                     </View>
                                     :
                                     <View style={styles.lastMessageContainer}>
-                                        {item.lastMessage.sender !== user?._id ? <Ionicons name="return-down-forward-outline" size={30} color="#666" /> : <Ionicons name="return-up-back-outline" size={30} color="#666" />}
-                                        <Text 
-                                        style={{ marginLeft: 10, fontSize: 18, color: "#666", maxWidth: 250 }}
-                                        ellipsizeMode='tail'
-                                        numberOfLines={1}>{item.lastMessage.message}</Text>
+                                        {item.lastMessage.sender !== user?._id ? <Ionicons name="return-down-forward-outline" size={30} color="#67667b" /> : <Ionicons name="return-up-back-outline" size={30} color="#67667b" />}
+                                        <Text
+                                            style={{ fontFamily: 'Montserrat-Medium', marginLeft: 10, fontSize: 18, color: "#67667b", maxWidth: 250 }}
+                                            ellipsizeMode='tail'
+                                            numberOfLines={1}>{item.lastMessage.message}</Text>
                                     </View>
                                 }
 
@@ -99,7 +108,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         borderBottomWidth: 1.5,
-        borderColor: '#666',
+        borderColor: '#67667b',
         width: '100%',
         overflow: 'hidden',
 

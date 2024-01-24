@@ -30,15 +30,13 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     const [chat, setChat] = useState<MessageType[]>([]);
     const [newMessage, setNewMessage] = useState<string>('');
     const [loading, setLoading] = useState<Boolean>(true);
-    const [lastMessageSender, setLastMessageSender] = useState<string>('')
     //Auth Hook
     const { user, token, socket } = useAuth();
 
     //Use fonts
     const [fontsLoaded] = useFonts({
-        'Montserrat-Regular': require('../../assets/fonts/Montserrat-Regular.ttf'),
-        'Montserrat-Light': require('../../assets/fonts/Montserrat-Light.ttf'),
         'Montserrat-Medium': require('../../assets/fonts/Montserrat-Medium.ttf'),
+        'Quicksand-Bold': require('../../assets/fonts/Quicksand-Bold.ttf')
     });
 
     //Use Ref to update database just when needed
@@ -106,7 +104,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
     if (loading || !fontsLoaded) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View style={{ backgroundColor: '#13101c', flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <ActivityIndicator size="large" color="#666" />
             </View>
         );
@@ -121,7 +119,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                     style={styles.profileImage}
                     source={{ uri: photoUrl }} />
 
-                <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#67667b' }}>{userName}</Text>
+                <Text style={{ fontSize: 28, fontFamily: 'Quicksand-Bold', color: '#67667b' }}>{userName}</Text>
             </View>
 
             <View style={styles.chatView}>
@@ -129,7 +127,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                 {chat && <FlatList
                     data={chat}
                     renderItem={({ item }) => {
-                        
+
                         if (user?._id === item.userId) {
                             return (
                                 <View style={styles.chatBubbleRight}>
@@ -156,10 +154,10 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                     value={newMessage}
                     onSubmitEditing={() => sendMessage()}
                     placeholder='Type a message'
-                    placeholderTextColor='#484759'
+                    placeholderTextColor='#67667b'
                 />
 
-                <Ionicons color='#484759' name='send' size={30} />
+                <Ionicons onPress={() => sendMessage()} color='#67667b' name='send' size={30} />
             </KeyboardAvoidingView>
 
         </SafeAreaView>
@@ -182,6 +180,8 @@ const styles = StyleSheet.create({
         paddingRight: 30,
         paddingLeft: 10,
         backgroundColor: '#13101c',
+        borderBottomWidth: 1,
+        borderBottomColor: '#67667b',
     },
     profileImage: {
         width: 60,
@@ -199,7 +199,8 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10,
         borderTopLeftRadius: 20,
         borderBottomLeftRadius: 20,
-        marginBottom: 4,
+        marginBottom: 2,
+        marginTop: 2,
         marginRight: 14,
         marginLeft: 44,
         alignSelf: 'flex-end',
@@ -214,7 +215,8 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         borderTopLeftRadius: 10,
         borderBottomLeftRadius: 2,
-        marginBottom: 4,
+        marginBottom: 2,
+        marginTop: 2,
         marginLeft: 14,
         marginRight: 44,
         alignSelf: 'flex-start',
@@ -230,19 +232,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     textInput: {
-        height: 36,
+        height: 40,
         width: '90%',
         borderWidth: 1,
-        borderColor: '#484759',
+        borderColor: '#67667b',
         borderRadius: 18,
         padding: 10,
-        fontSize: 16,
+        fontSize: 20,
         alignSelf: 'center',
-        color: '#484759',
-    },
-    chatFooter: {
-        height: 36,
-        width: '100%',
-        borderTopWidth: 1,
+        color: '#fff',
+        fontFamily: 'Montserrat-Medium'
     }
 });
