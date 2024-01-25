@@ -6,6 +6,7 @@ export type UserType = {
     photoUrl: string;
     likedList: string[];
     _id: string;
+    age: string;
 }
 
 export type LoginType = {

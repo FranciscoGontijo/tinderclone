@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, Text, View, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { fetchUserList, likeUser } from '../services/api';
 import { UserType } from '../services/auth';
@@ -76,7 +77,11 @@ const HomeScreen: React.FC = () => {
                                         source={{ uri: card.photoUrl }}
                                         resizeMode="cover"
                                         style={styles.cardImage} />
-                                    <Text style={styles.cardText}>{card.name}, {card.age}</Text>
+                                    <LinearGradient
+                                    style={styles.linearGradient}
+                                    colors={['rgba(0,0,0,0)', 'rgba(0,0,0,.8)']}>
+                                        <Text style={styles.cardText}>{card.name}, {card.age}</Text>
+                                    </LinearGradient>
                                 </View>
                             )
                         }}
@@ -101,11 +106,18 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 10,
         overflow: 'hidden',
+        position: 'relative'
 
     },
     cardImage: {
         height: '100%',
+        width: 'auto'
+    },
+    linearGradient: {
+        height: '20%',
         width: '100%',
+        position: 'absolute',
+        bottom: 0,
     },
     cardText: {
         fontFamily: 'Quicksand-Bold',
@@ -113,7 +125,5 @@ const styles = StyleSheet.create({
         marginLeft: 30,
         marginTop: 10,
         color: '#fff',
-        position: 'absolute',
-        bottom: 70
     }
 });
