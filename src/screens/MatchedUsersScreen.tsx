@@ -25,20 +25,17 @@ const MatchedUsersScreen: React.FC = () => {
     });
 
     useEffect(() => {
-
         setLoading(true);
         fetchMatchedUsersList(controller, token, setMatchedList, setLoading);
-
         return () => {
             controller.abort();
         }
     }, []);
 
-
     if (loading || !fontsLoaded) {
         return (
             <View style={{ backgroundColor: '#13101c', flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <ActivityIndicator size="large" color="#666" />
+                <ActivityIndicator size="large" color="#FF5864" />
             </View>
         );
     };
