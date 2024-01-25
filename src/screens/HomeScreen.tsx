@@ -6,17 +6,24 @@ import { UserType } from '../services/auth';
 
 import useAuth from '../../hooks/useAuth';
 import Swiper from 'react-native-deck-swiper';
+import { useFonts } from 'expo-font';
 
 //import components
 import Header from '../components/Header';
 
 const HomeScreen: React.FC = () => {
     const navigation = useNavigation();
-    const { user, logOut, token } = useAuth();
+    const { user, token } = useAuth();
     const controller = new AbortController();
 
     const [userList, setUserList] = useState<UserType[] | null>(null);
     const [loading, setLoading] = useState<Boolean>(true);
+
+    //Use fonts
+    const [fontsLoaded] = useFonts({
+        'Montserrat-Medium': require('../../assets/fonts/Montserrat-Medium.ttf'),
+        'Quicksand-Bold': require('../../assets/fonts/Quicksand-Bold.ttf')
+    });
 
     useEffect(() => {
 
@@ -42,10 +49,10 @@ const HomeScreen: React.FC = () => {
         };
     };
 
-    if (loading) {
+    if (loading || !fontsLoaded) {
         return (
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <ActivityIndicator size="large" color="#666" />
+            <View style={{ backgroundColor: '#13101c', flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#FF5864" />
             </View>
         );
     };
@@ -69,7 +76,7 @@ const HomeScreen: React.FC = () => {
                                         source={{ uri: card.photoUrl }}
                                         resizeMode="cover"
                                         style={styles.cardImage} />
-                                    <Text style={styles.cardText}>{card.name}</Text>
+                                    <Text style={styles.cardText}>{card.name}, {card.age}</Text>
                                 </View>
                             )
                         }}
@@ -83,40 +90,30 @@ const HomeScreen: React.FC = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-    profileImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-    },
-    header: {
-        height: 70,
-        marginTop: 25,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 10,
-    },
-    logoImage: {
-        height: 45,
-        width: 40,
-    },
     cardsContainer: {
-        flex: 1,
+        height: '100%',
+        width: '100%',
+        backgroundColor: '#13101c',
+        padding: 0
     },
     card: {
-        backgroundColor: "lightgray",
-        height: '75%',
+        backgroundColor: "#FF5864",
+        width: '100%',
         borderRadius: 10,
         overflow: 'hidden',
 
     },
     cardImage: {
-        height: '80%',
+        height: '100%',
         width: '100%',
     },
     cardText: {
-        fontWeight: 'bold',
-        fontSize: 20,
+        fontFamily: 'Quicksand-Bold',
+        fontSize: 30,
         marginLeft: 30,
         marginTop: 10,
+        color: '#fff',
+        position: 'absolute',
+        bottom: 70
     }
 });
