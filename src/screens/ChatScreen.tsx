@@ -43,6 +43,9 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     const chatRef = useRef(chat);
     let messagesCounter: number = 0;
 
+    //Flat list ref to auto scroll to the bottom of the screen
+    const flatListRef = useRef<FlatList | null>(null);
+
     //UserId is the matched user that 
     const { userId, userName, photoUrl } = route.params;
     const roomId: string = [user?._id.toString(), userId].sort().join('-');
@@ -54,7 +57,16 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
     useEffect(() => {
         chatRef.current = chat;
+        if (flatListRef.current && chat.length > 0) {
+            flatListRef.current.scrollToIndex({ index: 0, animated: true });
+        }
     }, [chat]);
+
+    const getItemLayout = (data: any, index: number) => ({
+        length: 40, // Adjust the value based on the actual height of your item
+        offset: 40 * index,
+        index,
+    });
 
     const startDatabaseUpdates = () => {
         //create an if that check if there is new messages
@@ -71,7 +83,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         setLoading(true);
 
         fetchChatMessages(userId, controller, token, setChat, setLoading);
-
+        flatListRef.current?.scrollToEnd({ animated: true });
         //Use socket.io to handle messages
         socket?.emit('openChat', { senderId: user?._id.toString(), recipientId: userId });
 
@@ -105,7 +117,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
     if (loading || !fontsLoaded) {
         return (
             <View style={{ backgroundColor: '#13101c', flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <ActivityIndicator size="large" color="#666" />
+                <ActivityIndicator size="large" color="#FF5864" />
             </View>
         );
     };
@@ -125,7 +137,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
             <View style={styles.chatView}>
 
                 {chat && <FlatList
+                    contentContainerStyle={{ flexDirection: 'column-reverse' }}
+                    ref={flatListRef}
                     data={chat}
+                    inverted
+                    keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => {
 
                         if (user?._id === item.userId) {
@@ -142,6 +158,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                             )
                         }
                     }}
+                    getItemLayout={getItemLayout}
                 />}
 
             </View>
