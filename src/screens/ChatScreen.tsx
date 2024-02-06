@@ -110,7 +110,11 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
 
     const sendMessage = (): void => {
-        socket?.emit('sendMessage', { chatRoomId: roomId, message: newMessage, name: user?.name, userId: user?._id });
+        if (newMessage.trim() === "") {
+            console.log("string is empty");
+        } else {
+            socket?.emit('sendMessage', { chatRoomId: roomId, message: newMessage, name: user?.name, userId: user?._id });
+        }
         setNewMessage('');
     };
 
