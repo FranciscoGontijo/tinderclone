@@ -62,8 +62,9 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
         }
     }, [chat]);
 
+    //use item laypout to scroll every time you send a message to the botttom of chat view
     const getItemLayout = (data: any, index: number) => ({
-        length: 40, // Adjust the value based on the actual height of your item
+        length: 40, 
         offset: 40 * index,
         index,
     });
@@ -84,6 +85,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
 
         fetchChatMessages(userId, controller, token, setChat, setLoading);
         flatListRef.current?.scrollToEnd({ animated: true });
+        
         //Use socket.io to handle messages
         socket?.emit('openChat', { senderId: user?._id.toString(), recipientId: userId });
 
@@ -173,9 +175,9 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ route }) => {
                     style={styles.textInput}
                     onChangeText={setNewMessage}
                     value={newMessage}
-                    onSubmitEditing={() => sendMessage()}
                     placeholder='Type a message'
                     placeholderTextColor='#67667b'
+                    multiline
                 />
 
                 <Ionicons onPress={() => sendMessage()} color='#67667b' name='send' size={30} />
@@ -253,12 +255,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     textInput: {
-        height: 40,
+        minHeight: 30,
+        maxHeight: 140,
         width: '90%',
         borderWidth: 1,
         borderColor: '#67667b',
         borderRadius: 18,
         padding: 10,
+        paddingLeft: 20,
         fontSize: 20,
         alignSelf: 'center',
         color: '#fff',
