@@ -64,7 +64,7 @@ const MatchedUsersScreen: React.FC = () => {
 
                                 {item.lastMessage.message === 'No messages yet' ?
                                     <View>
-                                        <Text style={{ marginLeft: 40, fontSize: 18, color: "#67667b", marginTop: 10, }}>Say hello!</Text>
+                                        <Text style={{ fontFamily: 'Montserrat-Medium', marginLeft: 10, fontSize: 18, color: "#67667b", maxWidth: 250 }}>Say hello!</Text>
                                     </View>
                                     :
                                     <View style={styles.lastMessageContainer}>
